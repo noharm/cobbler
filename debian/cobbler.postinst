@@ -8,6 +8,13 @@ if [ "$1" = "configure" ] ; then
     chown www-data:www-data /var/lib/cobbler/webui_cache
     chmod 0700 /var/lib/cobbler/webui_sessions
 
+    RAND_SECRET=$(openssl rand -base64 40 | sed 's/\//\\\//g')
+    sed -i -e "s/SECRET_KEY = ''/SECRET_KEY = \'$RAND_SECRET\'/" /usr/share/cobbler/web/settings.py
+
     a2enmod proxy_http
+    a2enmod ssl
+    a2ensite default-ssl
+    a2enconf cobbler
+    a2enconf cobbler_web
     /etc/init.d/apache2 reload
 fi
